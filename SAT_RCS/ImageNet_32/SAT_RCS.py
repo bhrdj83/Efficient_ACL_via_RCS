@@ -10,6 +10,9 @@ import torch
 from utils_log.utils import set_logger
 import attack_generator as attack
 from RCS import RCS
+#behrad
+# importing analyzer
+from ananlyzer import SubsetAnalyzer
 
 parser = argparse.ArgumentParser(description='PyTorch Adversarial Training')
 parser.add_argument('--epochs', type=int, default=100, metavar='N', help='number of epochs to train')
@@ -125,14 +128,39 @@ class Subset(Dataset[T_co]):
         return len(self.indices)
 
 # setup data loader
-train_transform = transforms.Compose([transforms.RandomCrop(32, padding=4), transforms.RandomHorizontalFlip(), transforms.ToTensor()])
-test_transform = transforms.ToTensor()
+#-----------behrad----------------
+# normalize is added by me
+#---------------------------------
+train_transform = transforms.Compose([transforms.RandomCrop(32, padding=4),
+                                      transforms.RandomHorizontalFlip(),
+                                      transforms.ToTensor(),
+                                      transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
+test_transform = transforms.Compose([transforms.ToTensor(),
+                                     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 
-from imagenet_downsampled import ImageNetDS
-data_path = './imagenet32'
-trainset = ImageNetDS(data_path, 32, train=True, transform=train_transform)
-testset = ImageNetDS(data_path, 32, train=False, transform=test_transform)
-num_classes = 1000
+# from imagenet_downsampled import ImageNetDS
+# data_path = './imagenet32'
+# trainset = ImageNetDS(data_path, 32, train=True, transform=train_transform)
+# testset = ImageNetDS(data_path, 32, train=False, transform=test_transform)
+# num_classes = 1000
+
+#--------------behrad---------------
+trainset = torchvision.datasets.CIFAR10(
+    root='./cifar-data',     # A new path for the CIFAR-10 data
+    train=True,              # This argument is the same
+    transform=train_transform, # This argument is the same
+    download=True            # Add this to fetch the data
+)
+
+testset = torchvision.datasets.CIFAR10(
+    root='./cifar-data',     # A new path for the CIFAR-10 data
+    train=False,              # This argument is the same
+    transform=test_transform, # This argument is the same
+    download=True            # Add this to fetch the data
+)
+
+num_classes = 10
+#-------------------------------------
     
 full_indices = np.arange(0,len(trainset),1)
 train_indices = np.random.choice(len(trainset), size=int(len(trainset) * 0.995), replace=False)
@@ -147,12 +175,18 @@ test_loader = torch.utils.data.DataLoader(testset, batch_size=256, shuffle=False
 
 
 print('==> Load Model')
-from models.wrn import WideResNet
-model = WideResNet(28, num_classes, 10, dropRate=0).cuda()
+# from models.wrn import WideResNet
+# model = WideResNet(28, num_classes, 10, dropRate=0).cuda()
+
+#--------behrad-----------
+model = torchvision.models.resnet18(weights=None, num_classes=num_classes).cuda()
+#-------------------------
 
 # if len(args.gpu.split(',')) > 1:
-model = torch.nn.DataParallel(model).cuda()
-optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay,nesterov=True)
+#------commented by behrad----------
+# model = torch.nn.DataParallel(model).cuda()
+#-----------------------------------
+optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay)
 
 import torch.backends.cudnn as cudnn
 cudnn.benchmark = True  # fire on all cylinders
