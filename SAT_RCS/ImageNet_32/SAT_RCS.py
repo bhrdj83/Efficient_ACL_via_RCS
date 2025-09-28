@@ -12,7 +12,7 @@ import attack_generator as attack
 from RCS import RCS
 #behrad
 # importing analyzer
-from ananlyzer import SubsetAnalyzer
+from analyzer import SubsetAnalyzer
 
 parser = argparse.ArgumentParser(description='PyTorch Adversarial Training')
 parser.add_argument('--epochs', type=int, default=100, metavar='N', help='number of epochs to train')
