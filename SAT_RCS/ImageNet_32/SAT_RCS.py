@@ -180,6 +180,7 @@ print('==> Load Model')
 
 #--------behrad-----------
 model = torchvision.models.resnet18(weights=None, num_classes=num_classes).cuda()
+model = torch.nn.DataParallel(model).cuda()
 #-------------------------
 
 # if len(args.gpu.split(',')) > 1:
