@@ -173,7 +173,7 @@ class RCS(Coreset):
             param.requires_grad = False
         
         self.model.eval()
-        linear_layer = self.model.module.linear
+        linear_layer = self.model.modules.linear
         state_dict_linear = linear_layer.state_dict()
 
         for name,param in linear_layer.named_parameters():
