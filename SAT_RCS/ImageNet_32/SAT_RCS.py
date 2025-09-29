@@ -276,8 +276,9 @@ for epoch in range(start_epoch, args.epochs):
                 lr_lambda=lambda step: cosine_annealing(step,
                                                         args.epochs * len(train_loader),
                                                         1,  # since lr_lambda computes multiplicative factor
-                                                        1e-6 / args.lr,
-                                                        warmup_steps=2 * len(train_loader))
+                                                        1e-6 / args.lr
+                                                        # ,warmup_steps=2 * len(train_loader)
+                                                    )
             )
         for i in range((epoch - 1) * len(train_loader)):
             scheduler.step()
