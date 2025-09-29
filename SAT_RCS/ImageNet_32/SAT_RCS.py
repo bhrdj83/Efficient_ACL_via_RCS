@@ -181,6 +181,7 @@ print('==> Load Model')
 #--------behrad-----------
 from models.resnet import ResNet18
 model = ResNet18(num_classes=num_classes).cuda()
+model = torch.nn.DataParallel(model).cuda()
 #-------------------------
 
 # if len(args.gpu.split(',')) > 1:
