@@ -179,8 +179,8 @@ print('==> Load Model')
 # model = WideResNet(28, num_classes, 10, dropRate=0).cuda()
 
 #--------behrad-----------
-model = torchvision.models.resnet18(weights=None, num_classes=num_classes).cuda()
-model = torch.nn.DataParallel(model).cuda()
+from models.resnet import ResNet18
+model = ResNet18(num_classes=num_classes).cuda()
 #-------------------------
 
 # if len(args.gpu.split(',')) > 1:

@@ -173,8 +173,7 @@ class RCS(Coreset):
             param.requires_grad = False
         
         self.model.eval()
-        # linear_layer = self.model.module.linear
-        linear_layer = self.model.module.fc
+        linear_layer = self.model.module.linear
 
         state_dict_linear = linear_layer.state_dict()
 
@@ -274,11 +273,9 @@ class RCS(Coreset):
                     linear_layer.weight.data = linear_layer.weight.data - self.lr * per_batch_ori_grads[index_list[r]][0]
                     linear_layer.bias.data = linear_layer.bias.data - self.lr * per_batch_ori_grads[index_list[r]][1]
                     
-                    # self.model.module.linear.weight.data = self.model.module.linear.weight.data - self.lr * per_batch_ori_grads[index_list[r]][0]
-                    # self.model.module.linear.bias.data = self.model.module.linear.bias.data - self.lr * per_batch_ori_grads[index_list[r]][1]
-                    self.model.module.fc.weight.data = self.model.module.fc.weight.data - self.lr * per_batch_ori_grads[index_list[r]][0]
-                    self.model.module.fc.bias.data = self.model.module.fc.bias.data - self.lr * per_batch_ori_grads[index_list[r]][1]
-                    
+                    self.model.module.linear.weight.data = self.model.module.linear.weight.data - self.lr * per_batch_ori_grads[index_list[r]][0]
+                    self.model.module.linear.bias.data = self.model.module.linear.bias.data - self.lr * per_batch_ori_grads[index_list[r]][1]
+                  
                     feature_val_nat = None
                     feature_val_adv = None
 
@@ -298,8 +295,7 @@ class RCS(Coreset):
                                 feature_val_adv = torch.cat([feature_val_adv, features_adv_before_linear.detach()], dim=0)
 
                     
-                    # linear_layer = self.model.module.linear
-                    linear_layer = self.model.module.fc
+                    linear_layer = self.model.module.linear
                     features = linear_layer(feature_val_nat)
                     features_adv = linear_layer(feature_val_adv)
                     print(features_adv.shape)
@@ -318,8 +314,7 @@ class RCS(Coreset):
                     index_list = del_tensor_ele(index_list, r)
 
                 linear_layer.load_state_dict(state_dict_linear)
-                # self.model.module.linear.load_state_dict(state_dict_linear)
-                self.model.module.fc.load_state_dict(state_dict_linear)
+                self.model.module.linear.load_state_dict(state_dict_linear)
 
 
                 batch_index_list = []
