@@ -199,7 +199,7 @@ class RCS(Coreset):
     
         features = linear_layer(feature_val_nat)
         features_adv = linear_layer(feature_val_adv)
-        print(features_adv.shape)
+        # print(features_adv.shape)
         valid_loss = self.loss_fn(features_adv,features)
         linear_layer.zero_grad()
         valid_loss.backward()
@@ -233,8 +233,8 @@ class RCS(Coreset):
             linear_layer.zero_grad()
             # features = linear_layer(features_before_linear)
             features_adv = linear_layer(features_adv_before_linear)
-            print(features_adv.shape)
-            print(target.shape)
+            # print(features_adv.shape)
+            # print(target.shape)
             batch_loss = torch.nn.CrossEntropyLoss()(features_adv, target)
             batch_loss.backward()
 
@@ -262,9 +262,9 @@ class RCS(Coreset):
                     # compute the gain function
                     grad_batch_list_curr = per_batch_grads[index_list]
                     gain = torch.matmul(grad_batch_list_curr, grad_val.reshape(-1,1)).squeeze()
-                    print(gain.shape)
+                    # print(gain.shape)
                     r = torch.argmax(gain, dim=0)
-                    print(gain[r])
+                    # print(gain[r])
                     subset_index.extend(batch_index_list[index_list[r]])
 
                     if j == batch_num - 1:
@@ -298,7 +298,7 @@ class RCS(Coreset):
                     linear_layer = self.model.module.linear
                     features = linear_layer(feature_val_nat)
                     features_adv = linear_layer(feature_val_adv)
-                    print(features_adv.shape)
+                    # print(features_adv.shape)
                     linear_layer.zero_grad()
                     valid_loss = self.loss_fn(features_adv,features)
 
