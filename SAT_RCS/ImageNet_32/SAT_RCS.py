@@ -80,7 +80,7 @@ def train(model, train_loader, optimizer, scheduler):
     model.train()
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.cuda(), target.cuda()
-        print(data.shape)
+        # print(data.shape)
         # Get Most adversarial training data via PGD
         if args.epsilon != 0:
             x_adv = attack.pgd(model,data,target,epsilon=args.epsilon,step_size=args.step_size,num_steps=args.num_steps,
