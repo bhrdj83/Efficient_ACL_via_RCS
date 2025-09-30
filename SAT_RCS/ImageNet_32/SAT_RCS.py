@@ -306,5 +306,13 @@ for epoch in range(start_epoch, args.epochs):
         test_nat_acc,
         )
     )
+    
+    print('Epoch: [%d | %d] | Train Time: %.2f s | Train Loss %.4f | Natural Test Acc %.4f\n' % (
+        epoch + 1,
+        args.epochs,
+        train_time,
+        train_loss,
+        test_nat_acc,
+        ))
 
     
