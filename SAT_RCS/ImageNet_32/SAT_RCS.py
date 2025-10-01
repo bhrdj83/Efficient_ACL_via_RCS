@@ -302,7 +302,7 @@ for epoch in range(start_epoch, args.epochs):
     })
     
     #-----------behrad----------------
-    analyzer.updtae_and_log_metrics_for_epoch(epoch, model, train_loader)
+    analyzer.update_and_log_metrics_for_epoch(epoch, model, train_loader)
     #---------------------------------
 
     logging.info(
