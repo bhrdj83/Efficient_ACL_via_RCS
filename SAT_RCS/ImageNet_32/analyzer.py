@@ -9,7 +9,7 @@ import torch.nn.functional as F
 from diffusers import DDPMScheduler, UNet2DModel
 import torchvision.transforms as transforms
 
-from attack_factory import AttackFactory
+from attacks_gh.attack_factory import AttackFactory
 
 CIFAR10_MEAN = (0.4914, 0.4822, 0.4465)
 CIFAR10_STD = (0.2470, 0.2435, 0.2616)
