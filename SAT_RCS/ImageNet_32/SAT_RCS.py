@@ -12,7 +12,7 @@ import attack_generator as attack
 from RCS import RCS
 #behrad
 # importing analyzer
-# from analyzer import SubsetAnalyzer
+from analyzer import SubsetAnalyzer
 
 parser = argparse.ArgumentParser(description='PyTorch Adversarial Training')
 parser.add_argument('--epochs', type=int, default=100, metavar='N', help='number of epochs to train')
@@ -22,7 +22,7 @@ parser.add_argument('--momentum', type=float, default=0.9, metavar='M', help='SG
 parser.add_argument('--epsilon', type=float, default=8, help='perturbation bound')
 parser.add_argument('--num_steps', type=int, default=10, help='maximum perturbation step K')
 parser.add_argument('--step_size', type=float, default=2/255, help='step size')
-parser.add_argument('--seed', type=int, default=7, metavar='S', help='random seed')
+parser.add_argument('--seed', type=int, default=11, metavar='S', help='random seed')
 parser.add_argument('--net', type=str, default="ResNet18",
                     help="decide which network to use,choose from smallcnn,resnet18,WRN")
 parser.add_argument('--tau', type=int, default=0, help='step tau')
@@ -255,6 +255,10 @@ coreset_class = RCS(trainset, fraction=args.fraction, validation_loader=valid_lo
 test_natloss_list = []
 test_natacc_list = []
 
+analyzer = SubsetAnalyzer(experiment_root="logs/results")
+
+analyzer.start_run(args.seed)
+
 for epoch in range(start_epoch, args.epochs):
     if epoch >= args.warmup and (epoch - 1) % args.fre == 0:
         tmp_state_dict = model.state_dict()
@@ -296,6 +300,10 @@ for epoch in range(start_epoch, args.epochs):
         'test_natloss_list': test_natloss_list,
         'test_natacc_list': test_natacc_list,
     })
+    
+    #-----------behrad----------------
+    analyzer.updtae_and_log_metrics_for_epoch(epoch, model, train_loader)
+    #---------------------------------
 
     logging.info(
         'Epoch: [%d | %d] | Train Time: %.2f s | Train Loss %.4f | Natural Test Acc %.4f\n' % (
@@ -313,6 +321,9 @@ for epoch in range(start_epoch, args.epochs):
         train_time,
         train_loss,
         test_nat_acc,
-        ))
+        )
+    )
 
-    
+analyzer.finalize_run()
+
+analyzer.aggregate_runs()    

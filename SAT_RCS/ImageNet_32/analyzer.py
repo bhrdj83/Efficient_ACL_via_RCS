@@ -9,7 +9,7 @@ import torch.nn.functional as F
 from diffusers import DDPMScheduler, UNet2DModel
 import torchvision.transforms as transforms
 
-from src.attacks.attack_factory import AttackFactory
+from attack_factory import AttackFactory
 
 CIFAR10_MEAN = (0.4914, 0.4822, 0.4465)
 CIFAR10_STD = (0.2470, 0.2435, 0.2616)
@@ -186,7 +186,7 @@ class SubsetAnalyzer:
         self.epochs_log = []
 
 
-    def update_and_log_metrics_for_epoch(self, epoch, model, subset_dataset, batch_size=256):
+    def update_and_log_metrics_for_epoch(self, epoch, model, subset_loader, batch_size=256):
         """
         Run all metric computations for the current epoch/seed and store them.
         """
@@ -199,12 +199,13 @@ class SubsetAnalyzer:
         # Create a temporary attack instance for the current model state
         attack = AttackFactory.create_attack(self.attack_config['name'], model, self.attack_config)
 
-        subset_loader = DataLoader(subset_dataset, batch_size=batch_size, shuffle=False, num_workers=2)
+        # subset_loader = DataLoader(subset_dataset, batch_size=batch_size, shuffle=False, num_workers=4, pin_memory=True)
         
         # This dict will hold lists of all per-sample metrics for this epoch
         current_epoch_metrics = {
             'clean_loss': [], 'robust_loss': [], 'entropy': [], 'margin': [],
-            'grad_magnitude': [], 'grad_variance': [], 'ddpm_loss': [], 
+            'grad_magnitude': [], 'grad_variance': [], 'mean_grad_magnitude': [],
+            'ddpm_loss': [],
         }
 
         grads = []
@@ -223,6 +224,7 @@ class SubsetAnalyzer:
             grad = data.grad.view(data.shape[0], -1)
             grad_mag = torch.norm(grad, p=2, dim=1)
             grads.append(grad)
+            
 
             # Adversarial metrics
             adv_data = attack.attack(data.detach(), target)
@@ -249,7 +251,8 @@ class SubsetAnalyzer:
             grad_var = torch.var(all_grads, dim=0, unbiased=True)  # Variance per feature
             grad_var_mean = torch.mean(grad_var).item()  # Mean variance across features
             current_epoch_metrics['grad_variance'] = [grad_var_mean]
-
+            mean_grad_mag = torch.norm(all_grads.mean(dim=0), p=2).item()
+            current_epoch_metrics['mean_grad_magnitude'] = [mean_grad_mag]
 
         # --- Pass 2: Generative Metric (DDPM Loss) ---
         if self.ddpm_model:
@@ -391,4 +394,3 @@ class SubsetAnalyzer:
             plt.savefig(out_path, dpi=120)
             plt.close()
             print(f"[Analyzer] Saved aggregate plot: {out_path}")
-
